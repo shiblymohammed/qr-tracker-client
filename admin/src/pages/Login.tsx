@@ -19,21 +19,24 @@ export default function Login({ setToken }: Props) {
     setError("");
     setLoading(true);
     try {
-      console.log("Attempting login with:", { username, password: "***" });
+      console.log("API URL:", import.meta.env.VITE_API_URL);
+      console.log("Attempting login with username:", username);
       const res = await api.post("/api/login/", {
-        username,
-        password,
+        username: username.trim(),
+        password: password.trim(),
       });
       console.log("Login successful:", res.data);
       setTokens(res.data.access, res.data.refresh);
       setToken(res.data.access);
       navigate("/");
     } catch (err: any) {
-      console.error("Login error:", err);
-      console.error("Error response:", err.response);
+      console.error("Full error:", err);
+      console.error("Error response data:", err.response?.data);
+      console.error("Error status:", err.response?.status);
       const errorMsg = err.response?.data?.detail || 
+                       err.response?.data?.non_field_errors?.[0] ||
                        err.response?.data?.message || 
-                       "Invalid credentials. Please try again.";
+                       "Invalid credentials. Please check username and password.";
       setError(errorMsg);
     } finally {
       setLoading(false);
