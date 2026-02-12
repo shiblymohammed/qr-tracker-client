@@ -6,7 +6,7 @@ import Locations from "./pages/Locations";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 export default function App() {
-  const [token, setToken] = useState(localStorage.getItem("access_token") || "");
+  const [, setToken] = useState(localStorage.getItem("access_token") || "");
 
   return (
     <BrowserRouter>
