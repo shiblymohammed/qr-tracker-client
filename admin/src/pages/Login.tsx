@@ -19,16 +19,22 @@ export default function Login({ setToken }: Props) {
     setError("");
     setLoading(true);
     try {
+      console.log("Attempting login with:", { username, password: "***" });
       const res = await api.post("/api/login/", {
         username,
         password,
       });
+      console.log("Login successful:", res.data);
       setTokens(res.data.access, res.data.refresh);
       setToken(res.data.access);
       navigate("/");
     } catch (err: any) {
-      console.error("Login error:", err.response?.data);
-      setError(err.response?.data?.detail || "Invalid credentials");
+      console.error("Login error:", err);
+      console.error("Error response:", err.response);
+      const errorMsg = err.response?.data?.detail || 
+                       err.response?.data?.message || 
+                       "Invalid credentials. Please try again.";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -92,6 +98,7 @@ export default function Login({ setToken }: Props) {
               placeholder="Enter your username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
               style={{
                 width: "100%",
                 padding: "12px 16px",
@@ -124,6 +131,7 @@ export default function Login({ setToken }: Props) {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
               style={{
                 width: "100%",
                 padding: "12px 16px",
