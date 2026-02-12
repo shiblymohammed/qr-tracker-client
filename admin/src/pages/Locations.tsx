@@ -8,7 +8,7 @@ type Location = {
   code: string;
 };
 
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://qr-tracker-server.onrender.com";
 
 export default function Locations() {
   const [locations, setLocations] = useState<Location[]>([]);
