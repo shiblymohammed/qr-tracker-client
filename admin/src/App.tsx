@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Locations from "./pages/Locations";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import "./App.css";
 
 export default function App() {
   const [, setToken] = useState(localStorage.getItem("access_token") || "");

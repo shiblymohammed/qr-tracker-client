@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { setTokens } from "../services/auth";
 import api from "../services/api";
+import { User, Lock, LogIn, AlertCircle } from "lucide-react";
+import "./Login.css";
 
 type Props = {
   setToken: (token: string) => void;
@@ -19,24 +21,19 @@ export default function Login({ setToken }: Props) {
     setError("");
     setLoading(true);
     try {
-      console.log("API URL:", import.meta.env.VITE_API_URL);
-      console.log("Attempting login with username:", username);
       const res = await api.post("/api/login/", {
         username: username.trim(),
         password: password.trim(),
       });
-      console.log("Login successful:", res.data);
       setTokens(res.data.access, res.data.refresh);
       setToken(res.data.access);
       navigate("/");
     } catch (err: any) {
-      console.error("Full error:", err);
-      console.error("Error response data:", err.response?.data);
-      console.error("Error status:", err.response?.status);
-      const errorMsg = err.response?.data?.detail || 
-                       err.response?.data?.non_field_errors?.[0] ||
-                       err.response?.data?.message || 
-                       "Invalid credentials. Please check username and password.";
+      const errorMsg =
+        err.response?.data?.detail ||
+        err.response?.data?.non_field_errors?.[0] ||
+        err.response?.data?.message ||
+        "Invalid credentials. Please check username and password.";
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -44,137 +41,80 @@ export default function Login({ setToken }: Props) {
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      padding: "20px"
-    }}>
-      <div style={{
-        background: "#1a1a2e",
-        padding: "40px",
-        borderRadius: "16px",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-        width: "100%",
-        maxWidth: "400px"
-      }}>
-        <div style={{ textAlign: "center", marginBottom: "30px" }}>
-          <h2 style={{ 
-            color: "#fff", 
-            fontSize: "28px", 
-            marginBottom: "8px",
-            fontWeight: "600"
-          }}>
-            QR Tracker Admin
-          </h2>
-          <p style={{ color: "#a0a0a0", fontSize: "14px" }}>
-            Sign in to your account
-          </p>
+    <div className="login-page">
+      <div className="login-background">
+        <div className="login-orb login-orb-1"></div>
+        <div className="login-orb login-orb-2"></div>
+        <div className="login-orb login-orb-3"></div>
+      </div>
+
+      <div className="login-container">
+        <div className="login-card">
+          <div className="login-header">
+            <div className="login-logo">Z</div>
+            <h1 className="login-title">ZEBA Admin</h1>
+            <p className="login-subtitle">Sign in to your account</p>
+          </div>
+
+          {error && (
+            <div className="alert alert-error">
+              <AlertCircle size={20} className="alert-icon" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="login-form">
+            <div className="form-group">
+              <label className="form-label">Username</label>
+              <div className="input-wrapper">
+                <User size={18} className="input-icon" />
+                <input
+                  type="text"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
+                  className="form-input"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Password</label>
+              <div className="input-wrapper">
+                <Lock size={18} className="input-icon" />
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  className="form-input"
+                  required
+                />
+              </div>
+            </div>
+
+            <button type="submit" disabled={loading} className="btn btn-primary btn-lg w-full">
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <LogIn size={18} />
+                  Sign In
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="login-footer">
+            <p>Secure admin access for QR tracking system</p>
+          </div>
         </div>
-
-        {error && (
-          <div style={{
-            background: "#ff4444",
-            color: "#fff",
-            padding: "12px",
-            borderRadius: "8px",
-            marginBottom: "20px",
-            fontSize: "14px"
-          }}>
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: "20px" }}>
-            <label style={{ 
-              display: "block", 
-              color: "#a0a0a0", 
-              marginBottom: "8px",
-              fontSize: "14px"
-            }}>
-              Username
-            </label>
-            <input
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoComplete="username"
-              style={{
-                width: "100%",
-                padding: "12px 16px",
-                background: "#16213e",
-                border: "2px solid #0f3460",
-                borderRadius: "8px",
-                color: "#fff",
-                fontSize: "14px",
-                outline: "none",
-                transition: "border-color 0.3s",
-                boxSizing: "border-box"
-              }}
-              onFocus={(e) => e.target.style.borderColor = "#667eea"}
-              onBlur={(e) => e.target.style.borderColor = "#0f3460"}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: "24px" }}>
-            <label style={{ 
-              display: "block", 
-              color: "#a0a0a0", 
-              marginBottom: "8px",
-              fontSize: "14px"
-            }}>
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              style={{
-                width: "100%",
-                padding: "12px 16px",
-                background: "#16213e",
-                border: "2px solid #0f3460",
-                borderRadius: "8px",
-                color: "#fff",
-                fontSize: "14px",
-                outline: "none",
-                transition: "border-color 0.3s",
-                boxSizing: "border-box"
-              }}
-              onFocus={(e) => e.target.style.borderColor = "#667eea"}
-              onBlur={(e) => e.target.style.borderColor = "#0f3460"}
-              required
-            />
-          </div>
-
-          <button 
-            type="submit" 
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "14px",
-              background: loading ? "#555" : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              border: "none",
-              borderRadius: "8px",
-              color: "#fff",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: loading ? "not-allowed" : "pointer",
-              transition: "transform 0.2s, opacity 0.2s",
-              opacity: loading ? 0.7 : 1
-            }}
-            onMouseEnter={(e) => !loading && (e.currentTarget.style.transform = "translateY(-2px)")}
-            onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
       </div>
     </div>
   );

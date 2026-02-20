@@ -1,9 +1,25 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { clearTokens } from "../../services/auth";
+import { LayoutDashboard, MapPin, Menu, LogOut, User } from "lucide-react";
+import "./MainLayout.css";
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      setIsSidebarOpen(!mobile);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleLogout = () => {
     clearTokens();
@@ -11,103 +27,87 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   };
 
   const navItems = [
-    { path: "/", label: "Dashboard", icon: "📊" },
-    { path: "/locations", label: "Locations", icon: "📍" }
+    { path: "/", label: "Dashboard", icon: LayoutDashboard },
+    { path: "/locations", label: "Locations", icon: MapPin },
   ];
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#0f0f1e" }}>
+    <div className="admin-layout">
       {/* Sidebar */}
-      <aside style={{
-        width: "250px",
-        background: "#1a1a2e",
-        padding: "20px",
-        display: "flex",
-        flexDirection: "column",
-        borderRight: "1px solid #2a2a3e"
-      }}>
-        <div style={{ marginBottom: "40px" }}>
-          <h1 style={{ 
-            color: "#fff", 
-            fontSize: "24px", 
-            fontWeight: "700",
-            margin: 0
-          }}>
-            QR Tracker
-          </h1>
-          <p style={{ color: "#666", fontSize: "12px", margin: "4px 0 0 0" }}>
-            Admin Dashboard
-          </p>
+      <aside className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
+        <div className="sidebar-header">
+          <div className="brand">
+            <div className="brand-icon">Z</div>
+            {isSidebarOpen && <span className="brand-name">ZEBA Admin</span>}
+          </div>
         </div>
 
-        <nav style={{ flex: 1 }}>
+        <nav className="sidebar-nav">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
+            const Icon = item.icon;
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "12px 16px",
-                  marginBottom: "8px",
-                  borderRadius: "8px",
-                  textDecoration: "none",
-                  color: isActive ? "#fff" : "#a0a0a0",
-                  background: isActive ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "transparent",
-                  transition: "all 0.3s",
-                  fontWeight: isActive ? "600" : "400"
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = "#16213e";
-                    e.currentTarget.style.color = "#fff";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = "transparent";
-                    e.currentTarget.style.color = "#a0a0a0";
-                  }
-                }}
+                className={`nav-item ${isActive ? "active" : ""}`}
+                onClick={() => isMobile && setIsSidebarOpen(false)}
               >
-                <span style={{ marginRight: "12px", fontSize: "18px" }}>
-                  {item.icon}
+                <span className="nav-icon">
+                  <Icon size={20} />
                 </span>
-                {item.label}
+                {isSidebarOpen && <span className="nav-label">{item.label}</span>}
               </Link>
             );
           })}
         </nav>
 
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "12px 16px",
-            background: "#ff4444",
-            border: "none",
-            borderRadius: "8px",
-            color: "#fff",
-            cursor: "pointer",
-            fontWeight: "600",
-            transition: "opacity 0.3s"
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.opacity = "0.8"}
-          onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
-        >
-          🚪 Logout
-        </button>
+        <div className="sidebar-footer">
+          <button
+            onClick={handleLogout}
+            className={`logout-btn ${!isSidebarOpen ? "icon-only" : ""}`}
+          >
+            <span className="logout-icon">
+              <LogOut size={18} />
+            </span>
+            {isSidebarOpen && <span>Logout</span>}
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <main style={{
-        flex: 1,
-        padding: "40px",
-        overflowY: "auto"
-      }}>
-        {children}
-      </main>
+      <div className="main-content">
+        {/* Top Bar */}
+        <header className="top-bar">
+          <button
+            className="menu-toggle"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            aria-label="Toggle menu"
+          >
+            <Menu size={20} />
+          </button>
+
+          <div className="top-bar-right">
+            <div className="user-info">
+              <div className="user-avatar">
+                <User size={18} />
+              </div>
+              <span className="user-name">Admin</span>
+            </div>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="page-content">{children}</main>
+      </div>
+
+      {/* Mobile Overlay */}
+      {isMobile && isSidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 }
