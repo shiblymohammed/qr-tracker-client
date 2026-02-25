@@ -27,19 +27,23 @@ function App() {
     <div className="landing-container">
       <div className="water-overlay"></div>
       
+      {/* Floating Bubbles */}
+      <div className="bubbles-container" aria-hidden="true">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <span key={i} className={`bubble bubble-${i + 1}`}></span>
+        ))}
+      </div>
+      
       <section className="hero-section">
         <div className="logo-container">
-          <img src="/logo.png" alt="ZEBA" className="brand-logo" />
-          <p className="tagline">Pure Drinking Water</p>
+          <img src="/logo.png" alt="ZEBA - Purely Poured" className="brand-logo" />
         </div>
         
-        <h2 className="hero-title">
-          PURE
-          <br />
-          NATURAL
-          <br />
-          REFRESHING
-        </h2>
+        <h1 className="hero-title">
+          <span className="hero-word hero-word-1">Pure</span>
+          <span className="hero-word hero-word-2">Natural</span>
+          <span className="hero-word hero-word-3">Refreshing</span>
+        </h1>
         
         <button className="order-now-button" onClick={handleOrderClick}>
           <svg className="button-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -101,6 +105,13 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* Wave Divider */}
+      <div className="wave-divider" aria-hidden="true">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+          <path d="M0,60 C240,120 480,0 720,60 C960,120 1200,0 1440,60 L1440,120 L0,120 Z" />
+        </svg>
+      </div>
 
       <footer className="footer-section">
         <p className="footer-title">Connect with us</p>
